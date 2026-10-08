@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign up - Grand Stay Hotel</title>
+  <link rel="stylesheet" href="auth.css" />
+</head>
+<body class="auth">
+  <aside class="visual" style="--bg:url('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1400&q=80')">
+    <a class="brand" href="index.html">GRAND<span>STAY</span></a>
+    <div>
+      <h2>Create your account and book in minutes.</h2>
+      <p class="sub">One account gives you access to every room, your booking history and easy cancellations.</p>
+      <ul class="points">
+        <li>Free to join</li>
+        <li>Secure password storage</li>
+        <li>Book rooms for any available dates</li>
+      </ul>
+    </div>
+    <small>&copy; Grand Stay Hotel</small>
+  </aside>
+
+  <main class="panel">
+    <div class="box">
+      <a class="mobile-brand" href="index.html">GRAND<span>STAY</span></a>
+      <h1>Create account</h1>
+      <p class="lead">Fill in your details to get started.</p>
+
+      <div id="alert" class="alert" hidden></div>
+
+      <form id="signupForm" novalidate>
+        <div class="field">
+          <label for="username">Username</label>
+          <div class="input"><input type="text" id="username" autocomplete="username" placeholder="3 to 20 characters" maxlength="20" /></div>
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <div class="input"><input type="email" id="email" autocomplete="email" placeholder="you@example.com" /></div>
+        </div>
+        <div class="field">
+          <label for="phoneNumber">Phone number</label>
+          <div class="input"><input type="text" id="phoneNumber" inputmode="numeric" autocomplete="tel" placeholder="10 digit number" maxlength="10" /></div>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="input has-toggle">
+            <input type="password" id="password" autocomplete="new-password" placeholder="At least 6 characters" />
+            <button type="button" class="toggle">Show</button>
+          </div>
+          <div class="strength"><i id="strengthBar"></i></div>
+          <div class="strength-text" id="strengthText">&nbsp;</div>
+        </div>
+        <button type="submit" class="submit" id="submitBtn">Create account</button>
+      </form>
+
+      <div class="alt">Already have an account? <a href="login.html">Log in</a></div>
+      <div class="alt" style="margin-top:0.4rem"><a class="home-link" href="index.html">&larr; Back to home</a></div>
+    </div>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    const form = document.getElementById("signupForm");
+    const alertBox = document.getElementById("alert");
+    const btn = document.getElementById("submitBtn");
+    const el = {
+      username: document.getElementById("username"),
+      email: document.getElementById("email"),
+      phoneNumber: document.getElementById("phoneNumber"),
+      password: document.getElementById("password"),
+    };
+
+    Auth.wireToggles();
+    if (Auth.loggedIn()) window.location.replace("rooms.html");
+
+    el.phoneNumber.addEventListener("input", () => {
+      el.phoneNumber.value = el.phoneNumber.value.replace(/\D/g, "").slice(0, 10);
+    });
+
+    el.password.addEventListener("input", () => {
+      const v = el.password.value;
+      let score = 0;
+      if (v.length >= 6) score++;
+      if (v.length >= 10) score++;
+      if (/[A-Z]/.test(v) && /[a-z]/.test(v)) score++;
+      if (/\d/.test(v) && /[^A-Za-z0-9]/.test(v)) score++;
+      const bar = document.getElementById("strengthBar");
+      const label = ["Too short", "Weak", "Okay", "Good", "Strong"][v ? score : 0];
+      bar.style.width = (v ? Math.max(score, 1) * 25 : 0) + "%";
+      bar.style.background = ["#ef4444", "#ef4444", "#f59e0b", "#84cc16", "#16a34a"][v ? score : 0];
+      document.getElementById("strengthText").textContent = v ? "Password strength: " + label : "\u00a0";
+    });
+
+    function validate(p) {
+      let ok = true;
+      const fail = (k, m) => { Auth.setFieldError(el[k], m); ok = false; };
+      if (p.username.length < 3 || p.username.length > 20) fail("username", "Username must be 3 to 20 characters");
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p.email)) fail("email", "Enter a valid email address");
+      if (!/^\d{10}$/.test(el.phoneNumber.value)) fail("phoneNumber", "Phone number must be exactly 10 digits");
+      else if (el.phoneNumber.value[0] === "0") fail("phoneNumber", "Phone number cannot start with 0");
+      if (p.password.length < 6) fail("password", "Password must be at least 6 characters");
+      return ok;
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      Auth.clearFieldErrors(form);
+      Auth.showAlert(alertBox, "", "");
+
+      const payload = {
+        username: el.username.value.trim(),
+        email: el.email.value.trim(),
+        phoneNumber: Number(el.phoneNumber.value),
+        password: el.password.value,
+      };
+      if (!validate(payload)) return;
+
+      Auth.setBusy(btn, true, "Creating account...");
+      const r = await Auth.post("/signup", payload);
+
+      if (r.ok && r.data && r.data.customerId) {
+        Auth.showAlert(alertBox, "success", `Welcome, ${r.data.username}! Redirecting you to login...`);
+        setTimeout(() => {
+          window.location.href = "login.html?registered=" + encodeURIComponent(r.data.username);
+        }, 1000);
+        return;
+      }
+
+      const msg = Auth.explain(r);
+      Object.keys(msg.fields).forEach((k) => { if (el[k]) Auth.setFieldError(el[k], msg.fields[k]); });
+      Auth.showAlert(alertBox, "error", msg.general || (Object.keys(msg.fields).length ? "Please fix the highlighted fields." : "Signup failed."));
+      Auth.setBusy(btn, false, "Create account");
+    });
+  </script>
+</body>
+</html>

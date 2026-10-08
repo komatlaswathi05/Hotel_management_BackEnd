@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rooms - Grand Stay Hotel</title>
+  <link rel="stylesheet" href="site.css" />
+</head>
+<body class="site">
+  <header class="nav">
+    <a class="brand" href="index.html">GRAND<span>STAY</span></a>
+    <nav class="nav-links">
+      <button class="link active" id="tabRooms" type="button">Rooms</button>
+      <button class="link" id="tabBookings" type="button">My Bookings</button>
+      <span class="user-chip"><span class="avatar" id="avatar">U</span><span id="userName"></span></span>
+      <button class="link" id="logoutBtn" type="button">Logout</button>
+    </nav>
+  </header>
+
+  <section class="hero small">
+    <div>
+      <div class="eyebrow">Room Availability</div>
+      <h1 id="heroTitle">Welcome</h1>
+      <p class="lead">Pick your dates to see which rooms are free, then book instantly.</p>
+    </div>
+  </section>
+
+  <!-- ROOMS VIEW -->
+  <main id="roomsView">
+    <div class="search-wrap">
+      <form class="search-bar" id="searchForm">
+        <div>
+          <label for="checkIn">Check-in</label>
+          <input type="date" id="checkIn" required />
+        </div>
+        <div>
+          <label for="checkOut">Check-out</label>
+          <input type="date" id="checkOut" required />
+        </div>
+        <div>
+          <label>Stay</label>
+          <div class="nights-pill" id="nightsPill">-</div>
+        </div>
+        <button class="btn-gold" type="submit">Check availability</button>
+      </form>
+    </div>
+
+    <section class="section">
+      <div class="container">
+        <div class="toolbar">
+          <div class="chips" id="typeChips"></div>
+          <div class="tools">
+            <label>Max price <input type="range" id="priceRange" /> <b id="priceLabel"></b></label>
+            <label>Sort
+              <select id="sortBy">
+                <option value="low">Price: low to high</option>
+                <option value="high">Price: high to low</option>
+                <option value="number">Room number</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <div class="result-count" id="resultCount"></div>
+        <div class="grid" id="roomGrid"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- BOOKINGS VIEW -->
+  <main id="bookingsView" hidden>
+    <section class="section">
+      <div class="container">
+        <div class="section-title">
+          <div class="eyebrow">Your trips</div>
+          <h2>My bookings</h2>
+        </div>
+        <div class="booking-list" id="bookingList"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ROOM DETAIL / BOOKING MODAL -->
+  <div class="modal-back" id="modalBack" hidden>
+    <div class="modal" role="dialog" aria-modal="true">
+      <button class="modal-close" id="modalClose" type="button" aria-label="Close">&times;</button>
+      <div class="gallery">
+        <div class="main"><img id="galleryMain" alt="Room photo" /></div>
+        <div class="thumbs" id="thumbs"></div>
+      </div>
+      <div class="modal-info">
+        <div>
+          <div class="room-no" id="mRoomNo"></div>
+          <h2 id="mTitle"></h2>
+        </div>
+        <p class="room-desc" id="mDesc"></p>
+        <div class="amenities" id="mAmenities"></div>
+        <div class="breakdown" id="mBreakdown"></div>
+        <div class="form-error" id="mError"></div>
+        <button class="btn-gold" id="confirmBtn" type="button">Confirm booking</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-box" id="toasts"></div>
+  <footer class="footer">&copy; Grand Stay Hotel &middot; Hotel Management System (Microservices)</footer>
+
+  <script src="config.js"></script>
+  <script src="rooms.js"></script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login - Grand Stay Hotel</title>
+  <link rel="stylesheet" href="auth.css" />
+</head>
+<body class="auth">
+  <aside class="visual" style="--bg:url('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1400&q=80')">
+    <a class="brand" href="index.html">GRAND<span>STAY</span></a>
+    <div>
+      <h2>Welcome back to your home away from home.</h2>
+      <p class="sub">Log in to check live room availability, book your stay and manage your reservations.</p>
+      <ul class="points">
+        <li>Live room availability for your dates</li>
+        <li>Instant booking confirmation</li>
+        <li>View and cancel your bookings</li>
+      </ul>
+    </div>
+    <small>&copy; Grand Stay Hotel</small>
+  </aside>
+
+  <main class="panel">
+    <div class="box">
+      <a class="mobile-brand" href="index.html">GRAND<span>STAY</span></a>
+      <h1>Log in</h1>
+      <p class="lead">Enter your username or email and your password.</p>
+
+      <div id="alert" class="alert" hidden></div>
+
+      <form id="loginForm" novalidate>
+        <div class="field">
+          <label for="usernameOrEmail">Username or email</label>
+          <div class="input"><input type="text" id="usernameOrEmail" autocomplete="username" placeholder="e.g. samitha or samitha@example.com" /></div>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="input has-toggle">
+            <input type="password" id="password" autocomplete="current-password" placeholder="Your password" />
+            <button type="button" class="toggle">Show</button>
+          </div>
+        </div>
+        <div class="row-between"><span></span><a href="forgot-password.html">Forgot password?</a></div>
+        <button type="submit" class="submit" id="submitBtn">Log in</button>
+      </form>
+
+      <div class="alt">New here? <a href="signup.html">Create an account</a></div>
+      <div class="alt" style="margin-top:0.4rem"><a class="home-link" href="index.html">&larr; Back to home</a></div>
+    </div>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="auth.js"></script>
+  <script>
+    const form = document.getElementById("loginForm");
+    const alertBox = document.getElementById("alert");
+    const btn = document.getElementById("submitBtn");
+    const idInput = document.getElementById("usernameOrEmail");
+    const pwInput = document.getElementById("password");
+
+    Auth.wireToggles();
+    if (Auth.loggedIn()) window.location.replace("rooms.html");
+
+    const params = new URLSearchParams(location.search);
+    if (params.get("registered")) {
+      Auth.showAlert(alertBox, "success", "Account created! Please log in.");
+      idInput.value = params.get("registered");
+      pwInput.focus();
+    } else if (params.get("reset")) {
+      Auth.showAlert(alertBox, "success", "Password changed. Please log in with your new password.");
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      Auth.clearFieldErrors(form);
+      Auth.showAlert(alertBox, "", "");
+
+      const usernameOrEmail = idInput.value.trim();
+      const password = pwInput.value;
+      let bad = false;
+      if (!usernameOrEmail) { Auth.setFieldError(idInput, "Username or email is required"); bad = true; }
+      if (!password) { Auth.setFieldError(pwInput, "Password is required"); bad = true; }
+      if (bad) return;
+
+      Auth.setBusy(btn, true, "Logging in...");
+      const r = await Auth.post("/login", { usernameOrEmail, password });
+
+      if (r.ok && r.data && r.data.customer) {
+        localStorage.setItem(SESSION_KEY, JSON.stringify(r.data.customer));
+        Auth.showAlert(alertBox, "success", "Login successful. Taking you to the rooms...");
+        setTimeout(() => { window.location.href = "rooms.html"; }, 600);
+        return;
+      }
+
+      const msg = Auth.explain(r);
+      Object.keys(msg.fields).forEach((k) => {
+        if (k === "usernameOrEmail") Auth.setFieldError(idInput, msg.fields[k]);
+        if (k === "password") Auth.setFieldError(pwInput, msg.fields[k]);
+      });
+      Auth.showAlert(alertBox, "error", msg.general || (Object.keys(msg.fields).length ? "" : "Login failed."));
+      Auth.setBusy(btn, false, "Log in");
+    });
+  </script>
+</body>
+</html>

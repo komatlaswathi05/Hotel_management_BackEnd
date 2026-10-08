@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Grand Stay Hotel - Home</title>
+  <link rel="stylesheet" href="site.css" />
+</head>
+<body class="site">
+  <header class="nav">
+    <a class="brand" href="index.html">GRAND<span>STAY</span></a>
+    <nav class="nav-links" id="navLinks"></nav>
+  </header>
+
+  <section class="hero">
+    <div>
+      <div class="eyebrow">Luxury &middot; Comfort &middot; Care</div>
+      <h1>Find your perfect stay</h1>
+      <p class="lead">Browse our rooms, check live availability for your dates and book in a few clicks.</p>
+      <div class="hero-actions" id="heroActions"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-title">
+        <div class="eyebrow">Why Grand Stay</div>
+        <h2>Everything for a great stay</h2>
+      </div>
+      <div class="features">
+        <div class="feature"><div class="icon">&#128197;</div><h3>Live availability</h3><p>Room availability is checked against real bookings for the dates you pick.</p></div>
+        <div class="feature"><div class="icon">&#128179;</div><h3>Clear pricing</h3><p>See the price per night and the total for your whole stay before booking.</p></div>
+        <div class="feature"><div class="icon">&#128221;</div><h3>Manage bookings</h3><p>View your booking history and cancel a booking whenever you need to.</p></div>
+        <div class="feature"><div class="icon">&#128274;</div><h3>Secure account</h3><p>Sign up once, log in with username or email and reset your password anytime.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="section-title">
+        <div class="eyebrow">Gallery</div>
+        <h2>A glimpse of the hotel</h2>
+      </div>
+      <div class="showcase">
+        <figure><img src="https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=800&q=75" alt="Hotel exterior" loading="lazy" /><figcaption>The Hotel</figcaption></figure>
+        <figure><img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=75" alt="Deluxe room" loading="lazy" /><figcaption>Deluxe Rooms</figcaption></figure>
+        <figure><img src="https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=800&q=75" alt="Resort pool" loading="lazy" /><figcaption>Poolside Relaxation</figcaption></figure>
+        <figure><img src="https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=800&q=75" alt="Suite" loading="lazy" /><figcaption>Signature Suites</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">&copy; Grand Stay Hotel &middot; Hotel Management System (Microservices)</footer>
+
+  <script src="config.js"></script>
+  <script>
+    const user = JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
+    const nav = document.getElementById("navLinks");
+    const hero = document.getElementById("heroActions");
+    if (user) {
+      nav.innerHTML = '<a href="rooms.html">Rooms</a><a href="rooms.html#bookings">My Bookings</a>';
+      hero.innerHTML = '<a class="btn-gold" href="rooms.html">Check room availability</a>';
+    } else {
+      nav.innerHTML = '<a href="login.html">Login</a><a href="signup.html">Signup</a>';
+      hero.innerHTML = '<a class="btn-gold" href="login.html">Login to book</a><a class="btn-ghost" href="signup.html">Create account</a>';
+    }
+  </script>
+</body>
+</html>
